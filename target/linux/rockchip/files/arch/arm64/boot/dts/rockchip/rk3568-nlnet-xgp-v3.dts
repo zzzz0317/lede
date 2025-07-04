@@ -1,0 +1,106 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+
+/dts-v1/;
+
+#include "rk3568-nlnet-xgp.dts"
+
+/delete-node/ &backlight;
+/delete-node/ &spi_gpio;
+
+/ {
+	model = "NLnet XiGuaPi Board V3";
+
+	leds {
+		pinctrl-0 = <&sys_led &net_led_pin>;
+
+		net_led: net-led {
+			gpios = <&gpio3 RK_PA4 GPIO_ACTIVE_HIGH>;
+			label = "blue:net";
+		};
+	};
+
+	led-controller {
+		compatible = "pwm-leds";
+
+		backlight: backlight {
+			label = "lcd:backlight";
+			pwms = <&pwm14 0 1000000 0>;
+			max-brightness = <255>;
+			linux,default-trigger = "default-on";
+		};
+	};
+};
+
+&pmu_io_domains {
+	vccio5-supply = <&vcc_3v3>;
+};
+
+&spi3 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&spi3m1_cs0 &spi3_sck &spi3_mosi>;
+	status = "okay";
+	display@0 {
+		pinctrl-names = "default";
+		pinctrl-0 = <&spi3_display_dc_pin &display_reset_pin>;
+		compatible = "galaxycore,gc9307";
+		reg = <0>;
+		rotate = <270>;
+		dc-gpios = <&gpio4 RK_PC5 GPIO_ACTIVE_HIGH>;
+		reset-gpios = <&gpio4 RK_PC4 GPIO_ACTIVE_LOW>;
+		backlight = <&backlight>;
+		buswidth = <8>;
+		debug = <0x0>;
+		mirror-y;
+		status = "okay";
+	};
+};
+
+&pinctrl {
+	/delete-property/ spi_gpio;
+	leds {
+		net_led_pin: net-led-pin {
+			rockchip,pins = <3 RK_PA4 RK_FUNC_GPIO &pcfg_pull_none>;
+		};
+	};
+
+	spi3 {
+		spi3_sck: spi3_sck {
+			rockchip,pins = <4 RK_PC2 2 &pcfg_pull_none>;
+		};
+		spi3_mosi: spi3_mosi {
+			rockchip,pins = <4 RK_PC3 2 &pcfg_pull_none>;
+		};
+	};
+
+	display {
+		spi3_display_dc_pin: spi3_display_dc_pin {
+			rockchip,pins = <4 RK_PC5 RK_FUNC_GPIO &pcfg_pull_none>;
+		};
+		display_reset_pin: display_reset_pin {
+			rockchip,pins = <4 RK_PC4 RK_FUNC_GPIO &pcfg_pull_none>;
+		};
+	};
+
+	backlight {
+		backlight_led_pin: backlight-led-pin {
+			rockchip,pins = <3 RK_PA2 RK_FUNC_GPIO &pcfg_pull_none>;
+		};
+	};
+
+	modem {
+		modem_reset_pins: modem-reset-pins {
+			rockchip,pins = <2 RK_PD7 RK_FUNC_GPIO &pcfg_pull_down>;
+		};
+	};
+};
+
+&pwm14 {
+	pinctrl-0 = <&pwm14m0_pins>;
+	pinctrl-names = "default";
+	status = "okay";
+};
+
+&usb2phy0_host {
+	pinctrl-0 = <&modem_reset_pins>;
+	pinctrl-names = "default";
+};
