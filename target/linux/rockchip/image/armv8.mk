@@ -369,7 +369,7 @@ define Device/nlnet_xgp
   DEVICE_MODEL := XiGuaPi
   SOC := rk3568
   UBOOT_DEVICE_NAME := nlnet-xgp-rk3568
-  IMAGE/sysupgrade.img.gz := boot-combined-nlnet-xgp | boot-script nlnet-xgp | pine64-img | gzip | append-metadata
+  IMAGE/sysupgrade.img.gz := boot-common | boot-script | pine64-img | gzip | append-metadata
   DEVICE_PACKAGES := kmod-hwmon-pwmfan kmod-mt7921e wpad-openssl
   DEVICE_DTS = rockchip/rk3568-nlnet-xgp-v3
 endef
