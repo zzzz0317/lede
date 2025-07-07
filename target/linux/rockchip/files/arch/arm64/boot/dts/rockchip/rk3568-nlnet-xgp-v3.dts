@@ -2,13 +2,28 @@
 
 /dts-v1/;
 
-#include "rk3568-nlnet-xgp.dts"
-
-/delete-node/ &backlight;
-/delete-node/ &spi_gpio;
+#include "rk3568-nlnet-xgz68.dtsi"
 
 / {
 	model = "NLnet XiGuaPi Board V3";
+	compatible = "nlnet,xgp", "rockchip,rk3568";
+
+	aliases {
+		ethernet0 = &gmac0;
+		ethernet1 = &gmac1;
+		led-boot = &sys_led;
+		led-failsafe = &sys_led;
+		led-running = &sys_led;
+		led-upgrade = &sys_led;
+	};
+
+	fan0: pwm-fan {
+		compatible = "pwm-fan";
+		pinctrl-names = "default";
+		#cooling-cells = <2>;
+		pwms = <&pwm7 0 40000 0>;
+		cooling-levels = <0 50 80 110 140 170 200 230 255>;
+	};
 
 	leds {
 		pinctrl-0 = <&sys_led &net_led_pin>;
@@ -28,6 +43,63 @@
 			max-brightness = <255>;
 			linux,default-trigger = "default-on";
 		};
+	};
+};
+
+&gmac0 {
+	assigned-clocks = <&cru SCLK_GMAC0_RX_TX>, <&cru SCLK_GMAC0>;
+	assigned-clock-parents = <&cru SCLK_GMAC0_RGMII_SPEED>;
+	assigned-clock-rates = <0>, <125000000>;
+	clock_in_out = "output";
+	phy-mode = "rgmii-id";
+	pinctrl-names = "default";
+	pinctrl-0 = <&gmac0_miim
+			&gmac0_tx_bus2
+			&gmac0_rx_bus2
+			&gmac0_rgmii_clk
+			&gmac0_rgmii_bus>;
+	snps,reset-gpio = <&gpio3 RK_PB7 GPIO_ACTIVE_LOW>;
+	snps,reset-active-low;
+	snps,reset-delays-us = <0 20000 100000>;
+	tx_delay = <0x3c>;
+	rx_delay = <0x2f>;
+	phy-handle = <&rgmii_phy0>;
+	status = "okay";
+};
+
+&gmac1 {
+	assigned-clocks = <&cru SCLK_GMAC1_RX_TX>, <&cru SCLK_GMAC1>;
+	assigned-clock-parents = <&cru SCLK_GMAC1_RGMII_SPEED>;
+	assigned-clock-rates = <0>, <125000000>;
+	clock_in_out = "output";
+	phy-mode = "rgmii";
+	pinctrl-names = "default";
+	pinctrl-0 = <&gmac1m1_miim
+			&gmac1m1_tx_bus2
+			&gmac1m1_rx_bus2
+			&gmac1m1_rgmii_clk
+			&gmac1m1_rgmii_bus>;
+	snps,reset-gpio = <&gpio3 RK_PB0 GPIO_ACTIVE_LOW>;
+	snps,reset-active-low;
+	snps,reset-delays-us = <0 20000 100000>;
+	tx_delay = <0x3c>;
+	rx_delay = <0x2f>;
+	phy-handle = <&rgmii_phy1>;
+	phy-supply = <&vcca1v8_image>;
+	status = "okay";
+};
+
+&mdio0 {
+	rgmii_phy0: ethernet-phy@0 {
+		compatible = "ethernet-phy-ieee802.3-c22";
+		reg = <0x1>;
+	};
+};
+
+&mdio1 {
+	rgmii_phy1: ethernet-phy@0 {
+		compatible = "ethernet-phy-ieee802.3-c22";
+		reg = <0x1>;
 	};
 };
 
@@ -56,7 +128,6 @@
 };
 
 &pinctrl {
-	/delete-property/ spi_gpio;
 	leds {
 		net_led_pin: net-led-pin {
 			rockchip,pins = <3 RK_PA4 RK_FUNC_GPIO &pcfg_pull_none>;
@@ -94,13 +165,72 @@
 	};
 };
 
+&pwm7 {
+	status = "okay";
+	pinctrl-0 = <&pwm7_pins>;
+	pinctrl-names = "default";
+};
+
 &pwm14 {
+	status = "okay";
 	pinctrl-0 = <&pwm14m0_pins>;
 	pinctrl-names = "default";
-	status = "okay";
 };
 
 &usb2phy0_host {
 	pinctrl-0 = <&modem_reset_pins>;
 	pinctrl-names = "default";
+};
+
+&cpu_thermal {
+	trips {
+		cpu_idle: cpu_idle {
+			temperature = <20000>;
+			hysteresis = <5000>;
+			type = "passive";
+		};
+		cpu_low: cpu_low {
+			temperature = <40000>;
+			hysteresis = <5000>;
+			type = "active";
+		};
+		cpu_warm: cpu_warm {
+			temperature = <50000>;
+			hysteresis = <5000>;
+			type = "active";
+		};
+		cpu_hot: cpu_hot {
+			temperature = <60000>;
+			hysteresis = <5000>;
+			type = "active";
+		};
+		cpu_hall: cpu_hall {
+			temperature = <70000>;
+			hysteresis = <5000>;
+			type = "active";
+		};
+	};
+
+	cooling-maps {
+		map0 {
+			trip = <&cpu_idle>;
+			cooling-device = <&fan0 0 1>;
+		};
+		map1 {
+			trip = <&cpu_low>;
+			cooling-device = <&fan0 1 3>;
+		};
+		map2 {
+			trip = <&cpu_warm>;
+			cooling-device = <&fan0 3 5>;
+		};
+		map3 {
+			trip = <&cpu_hot>;
+			cooling-device = <&fan0 5 7>;
+		};
+		map4 {
+			trip = <&cpu_hall>;
+			cooling-device = <&fan0 7 THERMAL_NO_LIMIT>;
+		};
+	};
 };
