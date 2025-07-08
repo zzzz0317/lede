@@ -797,10 +797,6 @@
 	status = "okay";
 };
 
-&usb2phy1 {
-	status = "okay";
-};
-
 &usb2phy0_host {
 	pinctrl-0 = <&modem_reset_pins>;
 	pinctrl-names = "default";
@@ -812,24 +808,7 @@
 	status = "okay";
 };
 
-&usb_host0_xhci {
-	extcon = <&usb2phy0>;
-	status = "okay";
-};
-
-&usb_host1_xhci {
-	status = "okay";
-};
-
-&usb2phy1_otg {
-	status = "okay";
-};
-
-&usb_host0_ehci {
-	status = "okay";
-};
-
-&usb_host0_ohci {
+&usb2phy1 {
 	status = "okay";
 };
 
@@ -837,11 +816,32 @@
 	status = "okay";
 };
 
-&usb_host1_ehci {
+&usb2phy1_otg {
+	status = "okay";
+};
+
+&usb_host0_ohci {
+	status = "okay";
+};
+
+&usb_host0_ehci {
+	status = "okay";
+};
+
+&usb_host0_xhci {
+	extcon = <&usb2phy0>;
 	status = "okay";
 };
 
 &usb_host1_ohci {
+	status = "okay";
+};
+
+&usb_host1_ehci {
+	status = "okay";
+};
+
+&usb_host1_xhci {
 	status = "okay";
 };
 
