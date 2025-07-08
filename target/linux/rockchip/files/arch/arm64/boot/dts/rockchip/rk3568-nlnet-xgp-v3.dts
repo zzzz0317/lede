@@ -98,7 +98,7 @@
 
 	pcie_pi6c_oe: pcie-pi6c-oe {
 		compatible = "regulator-fixed";
-		regulator-name = "pcie_pi6c_oe_en";
+		regulator-name = "pcie_pi6c_oe";
 		regulator-always-on;
 		regulator-boot-on;
 		enable-active-high;
@@ -129,6 +129,8 @@
 	vcc_3v3: vcc_3v3 {
 		compatible = "regulator-fixed";
 		regulator-name = "vcc_3v3";
+		regulator-always-on;
+		regulator-boot-on;
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
 		vin-supply = <&vcc3v3_sys>;
@@ -336,7 +338,7 @@
 	assigned-clock-parents = <&cru SCLK_GMAC1_RGMII_SPEED>;
 	assigned-clock-rates = <0>, <125000000>;
 	clock_in_out = "output";
-	phy-mode = "rgmii";
+	phy-mode = "rgmii-id";
 	pinctrl-names = "default";
 	pinctrl-0 = <&gmac1m1_miim
 			&gmac1m1_tx_bus2
@@ -704,7 +706,6 @@
 			rockchip,pins = <0 RK_PA6 RK_FUNC_GPIO &pcfg_pull_none>;
 		};
 	};
-
 };
 
 &pmu_io_domains {
@@ -766,6 +767,7 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&spi3m1_cs0 &spi3_sck &spi3_mosi>;
 	status = "okay";
+
 	display@0 {
 		pinctrl-names = "default";
 		pinctrl-0 = <&spi3_display_dc_pin &display_reset_pin>;
@@ -778,7 +780,6 @@
 		buswidth = <8>;
 		debug = <0x0>;
 		mirror-y;
-		status = "okay";
 	};
 };
 
@@ -803,6 +804,7 @@
 &usb2phy0_host {
 	pinctrl-0 = <&modem_reset_pins>;
 	pinctrl-names = "default";
+	status = "okay";
 };
 
 &usb2phy0_otg {
@@ -812,10 +814,6 @@
 
 &usb_host0_xhci {
 	extcon = <&usb2phy0>;
-	status = "okay";
-};
-
-&usb2phy0_host {
 	status = "okay";
 };
 
