@@ -312,7 +312,7 @@ define U-Boot/nlnet-xgp-rk3568
   $(U-Boot/rk3568/Default)
   NAME:=NLnet XGP Board
   BUILD_DEVICES:= \
-    nlnet_xgp
+    nlnet_xgp_v3
 endef
 
 define U-Boot/photonicat-rk3568

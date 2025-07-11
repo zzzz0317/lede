@@ -9,7 +9,7 @@
 
 / {
 	model = "NLnet XiGuaPi Board V3";
-	compatible = "nlnet,xgp", "rockchip,rk3568";
+	compatible = "nlnet,xgp-v3", "rockchip,rk3568";
 
 	aliases {
 		ethernet0 = &gmac0;
